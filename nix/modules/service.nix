@@ -18,7 +18,7 @@ in
     default = lib.getExe config.package;
   };
   options.runtimeConfigType = mkOption {
-    type = types.anything;
+    type = types.optionType;
     default = types.attrsOf (types.nullOr types.str);
   };
   options.runtimeConfig = mkOption {
