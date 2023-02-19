@@ -1,4 +1,4 @@
 [
 	(import ./frontend)
-	# (import ./server)
+	(import ./random-service)
 ]

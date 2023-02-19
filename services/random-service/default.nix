@@ -2,17 +2,14 @@
 let
   name = import ./name.nix;
   cfg = config.services.${name};
+  package = import ./package.nix;
 in
 {
   services."${name}" = {
-    package = pkgs.fileshare;
+    package = pkgs.callPackage package { inherit name; };
     runtimeConfigType = lib.extra.mkSubmoduleOpts ({
       PORT = lib.types.port;
     });
-    runtimeConfig = { PORT = 8888; };
-    # dependsOn.init = {};
-    # dependsOn.db.startOverride = true;
-    # dependsOn.worker.startOverride = false;
-    # startDeps = false;
+    runtimeConfig = { PORT = 9999; };
   };
 }
