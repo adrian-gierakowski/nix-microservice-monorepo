@@ -13,9 +13,14 @@ let
       (self: super: { nix-filter = import (import ./sources.nix).nix-filter; })
       (self: super: { kubenix = super.callPackage (import sources.kubenix) {}; })
       (self: super: {
-        platform = (self.kubenix.evalModules {
-          modules = (import ./../services) ++ [
-            (import ./modules/services.nix)
+        platform = (self.lib.evalModules {
+          modules = [
+            {
+              imports = [
+                ./../services
+                ./modules/services.nix
+              ];
+            }
         #     ({ pkgs, lib, ... }: {
         #       config.services.server2.package = pkgs.fileshare;
         #       config.services.server2.runtimeConfigType =

@@ -1,4 +1,6 @@
-[
-	(import ./frontend)
-	(import ./random-service)
-]
+{
+	imports = [
+		./frontend
+		./random-service
+	];
+}
