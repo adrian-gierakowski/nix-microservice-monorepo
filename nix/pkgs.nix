@@ -11,10 +11,24 @@ let
     [
       (self: super: { lib = super.lib.extend (lib: _: { extra = import ./lib-extra { inherit lib; }; }); })
       (self: super: { nix-filter = import (import ./sources.nix).nix-filter; })
+      # Load all packages from ./packages, using filename as the name of the
+      # pkgs attribute.
+      (self: super: super.lib.extra.importPackagesFromDir self ./packages)
       (self: super: { kubenix = super.callPackage (import sources.kubenix) {}; })
       (self: super: {
         platform = (self.lib.evalModules {
+          specialArgs = {
+            pkgs = self;
+            inputs = { inherit sources; nix = self.nix;};
+          };
           modules = [
+            {
+              config = {
+                # _module.args.baseModules = modules;
+                _module.args.pkgsPath = self.lib.mkDefault self.path;
+                _module.args.pkgs = self.lib.mkDefault self;
+              };
+            }
             {
               imports = [
                 ./../services
@@ -73,7 +87,7 @@ let
         #         obj = { A = 1; B = "C"; };
         #       };
         #     })
-          ];
+            ];
         });
       })
     ]

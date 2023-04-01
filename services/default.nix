@@ -1,6 +1,7 @@
 {
-	imports = [
-		./frontend
-		./random-service
-	];
+  imports = [
+    ./frontend
+    ./randomness-service
+    ./workerA
+  ];
 }

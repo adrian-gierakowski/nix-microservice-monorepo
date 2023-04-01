@@ -64,8 +64,11 @@ in
     runtimeEnv = mkOption {
       type = t.attrsOf t.str;
     };
-    runtimeEnvJson = mkOption {
+    runtimeEnvJsonStr = mkOption {
       type = t.str;
+    };
+    withRuntimeEnv = mkOption {
+      type = t.package;
     };
     dependsOn = mkOption {
       type = t.attrsOf dependsOnType;
@@ -83,7 +86,12 @@ in
   };
   config = {
     runtimeEnv = config.runtimeConfigToEnv config.runtimeConfig;
-    runtimeEnvJson = builtins.toJSON config.runtimeEnv;
+    runtimeEnvJsonStr = builtins.toJSON config.runtimeEnv;
+    withRuntimeEnv  = pkgs.writers.writeBashBin "${name}-with-runtime-env" ''
+      ${lib.getExe pkgs.with-env-from-json} \
+        ${builtins.toFile "${name}-runtime-env" config.runtimeEnvJsonStr} \
+        "''${@}"
+    '';
     depsToStart =
       let
         depNames = builtins.attrNames config.dependsOn;

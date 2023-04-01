@@ -2,10 +2,13 @@ const http = require('http')
 
 const host = process.env.HOST ?? '0.0.0.0'
 const port = Number(process.env.PORT)
-const randomRangeMax = Number(process.env.RANDOM_RANGE_MAX)
+const min = Number(process.env.RANDOM_GENERATOR_MIN ?? 0)
+const max = Number(process.env.RANDOM_GENERATOR_MAX ?? 1000)
 
-const requestListener = function (req, res) {
-  const body = Math.floor(Math.random() * randomRangeMax).toFixed()
+console.log(`starting with config`, { host, port, min, max })
+
+const requestListener = (req, res) => {
+  const body = Math.floor(Math.random() * (max - min) + min).toFixed()
   console.log('sending response', body)
   res.writeHead(200)
   res.end(body)
