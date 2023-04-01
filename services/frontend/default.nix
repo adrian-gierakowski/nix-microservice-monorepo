@@ -8,8 +8,9 @@ in
     package = pkgs.fileshare;
     runtimeConfigType = lib.extra.mkSubmoduleOpts ({
       PORT = lib.types.port;
+      CONTENTS_PATH = lib.types.str;
     });
-    runtimeConfig = { PORT = 8888; };
+    runtimeConfig = { PORT = 8888; CONTENTS_PATH = "./.data"; };
     # dependsOn.init = {};
     # dependsOn.db.startOverride = true;
     # dependsOn.worker.startOverride = false;

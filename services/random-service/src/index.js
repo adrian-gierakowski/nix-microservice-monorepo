@@ -2,9 +2,10 @@ const http = require('http')
 
 const host = process.env.HOST ?? '0.0.0.0'
 const port = Number(process.env.PORT)
+const randomRangeMax = Number(process.env.RANDOM_RANGE_MAX)
 
 const requestListener = function (req, res) {
-  const body = Math.floor(Math.random() * 1000).toFixed()
+  const body = Math.floor(Math.random() * randomRangeMax).toFixed()
   console.log('sending response', body)
   res.writeHead(200)
   res.end(body)

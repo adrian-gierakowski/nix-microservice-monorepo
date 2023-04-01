@@ -9,8 +9,8 @@ in
     package = pkgs.callPackage package { inherit name; };
     runtimeConfigType = lib.extra.mkSubmoduleOpts ({
       PORT = lib.types.port;
-      A = lib.types.str;
+      RANDOM_RANGE_MAX = lib.types.numbers.positive;
     });
-    runtimeConfig = { PORT = 9999; A = "bla"; };
+    runtimeConfig = { PORT = 9999; RANDOM_RANGE_MAX = 1; };
   };
 }

@@ -29,10 +29,10 @@
         "homepage": "",
         "owner": "deversifi",
         "repo": "nixpkgs",
-        "rev": "41b5736e8a7584ddf096a05b8b3afaf2a75e66fe",
-        "sha256": "0jg0jvc1acw9f71v0c7yyp13c37wjz2slnb3jd1d066g5vz3b3qi",
+        "rev": "f30990fc98b8468eba13d75f6c4c2190a61073ea",
+        "sha256": "1k47vlasr5nrhabc9xaynzhysvm7pilg8l6p5qbag3v81m79nl0y",
         "type": "tarball",
-        "url": "https://github.com/deversifi/nixpkgs/archive/41b5736e8a7584ddf096a05b8b3afaf2a75e66fe.tar.gz",
+        "url": "https://github.com/deversifi/nixpkgs/archive/f30990fc98b8468eba13d75f6c4c2190a61073ea.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     }
 }
