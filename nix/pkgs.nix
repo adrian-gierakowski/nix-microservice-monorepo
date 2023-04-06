@@ -33,7 +33,34 @@ let
               imports = [
                 ./../services
                 ./modules/services.nix
+                ./modules/process-compose.nix
               ];
+              config = {
+                process-compose.default = {
+                  environment = ["A=a" "B=a"];
+                  processes = {
+                    echo = {
+                      package = self.writers.writeBashBin "my-process" ''
+                        echo A: $A, B: $B
+                      '';
+                      availability.restart = "always";
+                    };
+                  };
+                };
+              };
+            }
+            {
+              config = {
+                process-compose.default = {
+                  processes = {
+                    echo = {
+                      package = self.lib.mkForce (self.writers.writeBashBin "my-process" ''
+                        echo  A: $A, B: $B
+                      '') ;
+                    };
+                  };
+                };
+              };
             }
         #     ({ pkgs, lib, ... }: {
         #       config.services.server2.package = pkgs.fileshare;
