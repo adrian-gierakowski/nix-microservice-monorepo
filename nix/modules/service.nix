@@ -47,6 +47,9 @@ in
       type = t.path;
       default = lib.getExe config.package;
     };
+    runWithEnv = mkOption {
+      type = t.package;
+    };
     runtimeConfigType = mkOption {
       type = t.optionType;
       default = t.attrsOf (t.nullOr t.str);
@@ -90,6 +93,11 @@ in
     withRuntimeEnv  = pkgs.writers.writeBashBin "${name}-with-runtime-env" ''
       ${lib.getExe pkgs.with-env-from-json} \
         ${builtins.toFile "${name}-runtime-env" config.runtimeEnvJsonStr} \
+        "''${@}"
+    '';
+    runWithEnv = pkgs.writers.writeBashBin "${name}-run-with-env" ''
+      ${lib.getExe config.withRuntimeEnv} \
+        ${config.exe} \
         "''${@}"
     '';
     depsToStart =

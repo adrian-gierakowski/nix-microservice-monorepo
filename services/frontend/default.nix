@@ -5,12 +5,14 @@ let
 in
 {
   services."${name}" = {
-    package = pkgs.fileshare;
+    package = pkgs.writers.writeBashBin name ''
+      ${lib.getExe pkgs.fileshare} -p "$PORT" "$DATA_DIR"
+    '';
     runtimeConfigType = lib.extra.mkSubmoduleOpts ({
       PORT = lib.types.port;
-      CONTENTS_PATH = lib.types.str;
+      DATA_DIR = lib.types.str;
     });
-    runtimeConfig = { PORT = 8888; CONTENTS_PATH = "./.data"; };
+    runtimeConfig = { PORT = 8888; DATA_DIR = "./.data"; };
     # dependsOn.init = {};
     # dependsOn.db.startOverride = true;
     # dependsOn.worker.startOverride = false;
