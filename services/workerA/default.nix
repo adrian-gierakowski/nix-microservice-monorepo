@@ -5,9 +5,7 @@ let
 in
 {
   services."${name}" = {
-    package = pkgs.writers.writeBashBin name ''
-      set -ueo pipefail
-
+    package = pkgs.writers-extra.writeBashBinStrict name ''
       write_to_path="$DATA_DIR/$WRITE_TO_FIILE_NAME"
 
       response=$(${lib.getExe pkgs.curl} -s http://$RANDOMNESS_SERVICE_HOST:$RANDOMNESS_SERVICE_PORT)

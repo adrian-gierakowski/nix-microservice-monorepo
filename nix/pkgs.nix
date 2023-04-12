@@ -36,7 +36,7 @@ let
                 ./modules/process-compose.nix
               ];
               config = {
-                process-compose.default = {
+                process-compose.default.config = {
                   environment = ["A=a" "B=a"];
                   processes = {
                     echo = {
@@ -51,7 +51,7 @@ let
             }
             {
               config = {
-                process-compose.default = {
+                process-compose.default.config = {
                   processes = {
                     echo = {
                       package = self.lib.mkForce (self.writers.writeBashBin "my-process" ''

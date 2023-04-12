@@ -15,5 +15,6 @@ in
       PORT = 9999;
       HOST = "localhost";
     };
+    dependsOn.workerA = {};
   };
 }

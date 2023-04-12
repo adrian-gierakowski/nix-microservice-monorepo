@@ -6,6 +6,7 @@
   ripgrep,
   runCommandNoCC,
   writers,
+  writeText,
 }:
 rec {
   writeScriptChecked = interpreter:
@@ -46,6 +47,12 @@ rec {
 
   writeBashBin = name: writeBashChecked "/bin/${name}";
 
+  writeBashBinStrict = name: content: writeBashBin name ''
+    set -ueo pipefail
+
+    ${content}
+  '';
+
   mkScriptBinWithDeps = interpreter: deps: name: content:
     let
       script-no-deps = writeBashChecked
@@ -60,4 +67,10 @@ rec {
   ;
 
   mkBashScriptBinWithDeps = mkScriptBinWithDeps "${bash}/bin/bash";
+
+  writeJSON = { name, ext ? "json" }: value:
+    let
+      fullName = "${name}${if ext == "" then "" else ".${ext}"}";
+    in
+      writeText fullName (builtins.toJSON value);
 }

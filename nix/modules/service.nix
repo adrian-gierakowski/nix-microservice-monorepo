@@ -86,17 +86,28 @@ in
       type = t.listOf t.str;
       description = "List of deps to start when this service starts, calculated based on dependsOn.<dep>.startOverride and startDeps.";
     };
+    process-compose = mkOption {
+      type = t.submoduleWith {
+        specialArgs = {
+          pkgs = pkgs;
+          name = "${name}-internal";
+        };
+        shorthandOnlyDefinesConfig = true;
+        modules = [{ imports = [./process-compose-options.nix]; }];
+      };
+      default = {};
+    };
   };
   config = {
     runtimeEnv = config.runtimeConfigToEnv config.runtimeConfig;
     runtimeEnvJsonStr = builtins.toJSON config.runtimeEnv;
-    withRuntimeEnv  = pkgs.writers.writeBashBin "${name}-with-runtime-env" ''
-      ${lib.getExe pkgs.with-env-from-json} \
+    withRuntimeEnv  = pkgs.writers-extra.writeBashBinStrict "${name}-with-runtime-env" ''
+      exec ${lib.getExe pkgs.with-env-from-json} \
         ${builtins.toFile "${name}-runtime-env" config.runtimeEnvJsonStr} \
         "''${@}"
     '';
-    runWithEnv = pkgs.writers.writeBashBin "${name}-run-with-env" ''
-      ${lib.getExe config.withRuntimeEnv} \
+    runWithEnv = pkgs.writers-extra.writeBashBinStrict "${name}-run-with-env" ''
+      exec ${lib.getExe config.withRuntimeEnv} \
         ${config.exe} \
         "''${@}"
     '';
@@ -112,5 +123,16 @@ in
       in
         builtins.filter shouldStart depNames
     ;
+    process-compose = {
+      config.processes = {
+        "${name}" = {
+          package = config.runWithEnv;
+          availability.restart = "always";
+          depends_on = lib.genAttrs config.depsToStart (depName: {
+            condition = config.dependsOn.${depName}.condition;
+          });
+        };
+      };
+    };
   };
 }
