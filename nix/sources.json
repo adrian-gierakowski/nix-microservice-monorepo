@@ -1,5 +1,17 @@
 {
     "kubenix": {
+        "branch": "main",
+        "description": "Kubernetes management with Nix",
+        "homepage": "https://kubenix.org",
+        "owner": "hall",
+        "repo": "kubenix",
+        "rev": "20907f568e1beba86ecbf2383b0158867a2040c7",
+        "sha256": "1mksr706zjixjbvmxi5bfglx77facrbgcrzkafcnrd3r874dayy0",
+        "type": "tarball",
+        "url": "https://github.com/hall/kubenix/archive/20907f568e1beba86ecbf2383b0158867a2040c7.tar.gz",
+        "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
+    },
+    "kubenix-dvf": {
         "branch": "deversifi-support-k8s-1.18-1.23",
         "description": "Kubernetes resource builder using nix",
         "homepage": null,
