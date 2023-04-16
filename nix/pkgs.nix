@@ -14,9 +14,12 @@ let
       # Load all packages from ./packages, using filename as the name of the
       # pkgs attribute.
       (self: super: super.lib.extra.importPackagesFromDir self ./packages)
-      (self: super: { kubenix = super.callPackage (import sources.kubenix) {}; })
+      # (self: super: { kubenix = (import /home/adrian/code/kubenix-hall-adrian).kubenix.${self.system}; })
+      (self: super: { kubenix = self.callPackage (import /home/adrian/code/rhinofi/kubenix/default.nix) {}; })
+      # (import sources.kubenix).overlays.default
       (self: super: {
-        platform = (self.lib.evalModules {
+        # platform = ((builtins.trace self.kubenix self.kubenix).evalModules {
+        platform = self.lib.evalModules {
           specialArgs = {
             pkgs = self;
             inputs = { inherit sources; nix = self.nix;};
@@ -37,7 +40,7 @@ let
               ];
               config = {
                 process-compose.default.config = {
-                  environment = ["A=a" "B=a"];
+                  environment = ["A=${self.kubenix.lib.k8s.octalToDecimal "11"}" "B=a"];
                   processes = {
                     echo = {
                       package = self.writers.writeBashBin "my-process" ''
@@ -115,7 +118,7 @@ let
         #       };
         #     })
             ];
-        });
+        };
       })
     ]
     ++
