@@ -35,6 +35,18 @@
         "url": "https://github.com/numtide/nix-filter/archive/1a3b735e13e90a8d2fd5629f2f8363bd7ffbbec7.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
+    "nix-test-runner": {
+        "branch": "master",
+        "description": "Test runner for nix expressions",
+        "homepage": "",
+        "owner": "stoeffel",
+        "repo": "nix-test-runner",
+        "rev": "c45d45b11ecef3eb9d834c3b6304c05c49b06ca2",
+        "sha256": "12qqmxi4pmyahhk7537nw75fffbw29g2c7l7g0vzhds0bf9758hl",
+        "type": "tarball",
+        "url": "https://github.com/stoeffel/nix-test-runner/archive/c45d45b11ecef3eb9d834c3b6304c05c49b06ca2.tar.gz",
+        "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
+    },
     "nixpkgs": {
         "branch": "fix-yarn2nix-for-nix-2.5-6_29769d2a1390d294469bcc6518f17931953545e1",
         "description": "Nix Packages collection",

@@ -86,4 +86,53 @@ rec {
   ;
 
   toJSONFile = name: config: builtins.toFile "${name}.json" (builtins.toJSON config);
+
+  tracePrefix = prefix: x:
+    builtins.trace ("${prefix} ${lib.generators.toPretty {} x}") x
+  ;
+
+  filterValue =
+    let
+      filterValueWithName = pred: name: x:
+        if !(pred name x)
+        then []
+        else if builtins.isList x
+        then [(filterList pred x)]
+        else if builtins.isAttrs x
+        then [(filterAttrs pred x)]
+        else [x]
+      ;
+      filterList = pred: builtins.concatMap
+        (filterValueWithName pred null)
+      ;
+      filterAttrs = pred: value:
+        builtins.listToAttrs (
+          builtins.concatMap
+            (name:
+              let
+                result = filterValueWithName pred name value.${name};
+              in
+                map (lib.nameValuePair name) result
+            )
+            (builtins.attrNames value)
+          )
+      ;
+    in pred: value: filterValueWithName pred null value
+  ;
+
+  isIn = v: list: builtins.any (e: v == e) list;
+
+  cleanConfig = removeAttrNames: lib.filterAttrsRecursive (name: value:
+    !(isIn name removeAttrNames || builtins.isFunction value)
+  );
+
+  prependPrefixToAttrNames = prefix: lib.mapAttrs'
+    (name: value: lib.nameValuePair "${prefix}${name}" value)
+  ;
+
+  headOr = default: list:
+    if list == []
+    then default
+    else builtins.head list
+  ;
 }
