@@ -60,33 +60,7 @@ let
                 ./modules/services.nix
                 ./modules/process-compose.nix
               ];
-              # config = {
-              #   process-compose.default.config = {
-              #     environment = ["A=b" "B=a"];
-              #     processes = {
-              #       echo = {
-              #         package = self.writers.writeBashBin "my-process" ''
-              #           echo A: $A, B: $B
-              #         '';
-              #         availability.restart = "always";
-              #       };
-              #     };
-              #   };
-              # };
             }
-            # {
-            #   config = {
-            #     process-compose.default.config = {
-            #       processes = {
-            #         echo = {
-            #           package = self.lib.mkForce (self.writers.writeBashBin "my-process" ''
-            #             echo  A: $A, B: $B
-            #           '') ;
-            #         };
-            #       };
-            #     };
-            #   };
-            # }
           ];
         };
       })
