@@ -135,4 +135,22 @@ rec {
     then default
     else builtins.head list
   ;
+
+  assocPath = path: value: attrs:
+    lib.recursiveUpdateUntil
+      (currentPath: _: _: currentPath == path)
+      attrs
+      (lib.setAttrByPath path value)
+  ;
+
+  overPathIfExists = path: func: attrs:
+    if lib.hasAttrByPath path attrs
+    then
+      let
+        currentValue = lib.getAttrFromPath path attrs;
+        newValue = func currentValue;
+      in
+        assocPath path newValue attrs
+    else attrs
+  ;
 }

@@ -21,24 +21,33 @@ let
       # (self: super: { kubenix = (import /home/adrian/code/kubenix-hall-adrian).kubenix.${self.system}; })
       (import /home/adrian/code/kubenix-hall-adrian/default.nix).overlays.default
       # (import sources.kubenix).overlays.default
-      (self: super: let inherit (super) lib; in {
-        platformConfig = lib.extra.headOr {} (lib.extra.filterValue
-          (name: value: !(
-            # lib.extra.isIn name []
-            # ||
-            builtins.isFunction value
-            ||
-            lib.types.isOptionType value
-          ))
+      (self: super: let
+        inherit (super) lib;
+        removeEmptyAttrs = lib.converge (lib.filterAttrsRecursive (name: value: !(value == {})));
+      in {
+        platformConfig = lib.pipe
           self.platform.config
-        );
+          [
+            (lib.extra.filterValue
+              (name: value: !(
+                # lib.extra.isIn name []
+                # ||
+                builtins.isFunction value
+                ||
+                lib.types.isOptionType value
+            )))
+            (lib.extra.headOr {})
+            (lib.extra.overPathIfExists ["kubernetes" "api"] (a: builtins.removeAttrs a ["definitions" "types"]))
+            (lib.extra.overPathIfExists ["kubernetes" "api" "resources"] removeEmptyAttrs)
+          ]
+        ;
         platformConfigJSON = self.writers-extra.writeJSON
           { name = "platform-config-json"; }
           self.platformConfig
         ;
         # test = self.lib.evalModules { modules = []; };
-        # platform = self.kubenix.evalModules {
-        platform = self.lib.evalModules {
+        platform = self.kubenix.evalModules {
+        # platform = self.lib.evalModules {
           specialArgs = {
             pkgs = self;
             inputs = { inherit sources; nix = self.nix;};
@@ -48,19 +57,35 @@ let
               config = {
                 # _module.args.baseModules = modules;
                 # _module.args.pkgsPath = self.lib.mkDefault self.path;
-                _module.args.pkgs = self.lib.mkDefault self;
+                # _module.args.pkgs = self.lib.mkDefault self;
               };
             }
-            # ({ kubenix, ... }: {
-            #   imports = with kubenix.modules; [k8s];
-            # })
+            ({ kubenix, ... }: {
+              imports = with kubenix.modules; [k8s];
+              kubernetes.resources.deployments.my-deployment = {
+                spec = {
+                  selector.matchLabels.app = "my-deployment";
+                  # template.metadata.labels.app = "my-deployment";
+                  template.spec = {
+                    containers.my-deployment = {
+                      # image = "my-deployment";
+                    };
+                  };
+                };
+              };
+            })
             {
-              imports = [
-                ./../services
-                ./modules/services.nix
-                ./modules/process-compose.nix
-              ];
+              kubernetes.api.resources.apps.v1.Deployment.my-deployment.metadata.annotations = {
+                my-annotation = "some-annotation";
+              };
             }
+            # {
+            #   imports = [
+            #     ./../services
+            #     ./modules/services.nix
+            #     ./modules/process-compose.nix
+            #   ];
+            # }
           ];
         };
       })
