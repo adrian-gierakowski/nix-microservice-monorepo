@@ -1,11 +1,11 @@
 { config, pkgs, lib, ... }:
 let
   name = import ./name.nix;
-  cfg = config.services.${name};
+  cfg = config.processes.${name};
   package = import ./package.nix;
 in
 {
-  services."${name}" = {
+  processes."${name}" = {
     package = pkgs.callPackage package { inherit name; };
     runtimeConfigType = lib.extra.mkSubmoduleOpts ({
       PORT = lib.types.port;

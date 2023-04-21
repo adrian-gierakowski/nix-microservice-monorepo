@@ -39,6 +39,26 @@ let
 in
 {
   options = {
+    type = mkOption {
+      type = t.enum [
+        "server"
+        "worker"
+        "job"
+        "cronJob"
+      ];
+      default = "server";
+      description = ''
+        Process type:
+        - server: runs continuously and exposes an API which can be used to contact it from outside
+        - worker: runs continuously but cannot be contacted from outside
+        - job: runs once
+        - cronJob: runs on a schedule
+      '';
+    };
+    name = mkOption {
+      type = t.str;
+      default = name;
+    };
     package = mkOption {
       type = t.package;
     };
@@ -64,9 +84,7 @@ in
     };
     runtimeConfigToEnv = mkOption {
       type = t.functionTo (t.attrsOf t.str);
-      default = attrs:
-        let nonNullAttrs = lib.filterAttrs (n: v: n != null) attrs;
-        in lib.extra.attrsToAttsOfJsonStrings attrs;
+      default = lib.extra.attrsToAttsOfJsonStrings;
     };
     runtimeEnv = mkOption {
       type = t.attrsOf t.str;
@@ -108,27 +126,6 @@ in
         in
           builtins.filter shouldStart depNames
       ;
-    };
-    process-compose = mkOption {
-      type = t.submoduleWith {
-        specialArgs = {
-          pkgs = pkgs;
-          name = "${name}-internal";
-        };
-        shorthandOnlyDefinesConfig = true;
-        modules = [{ imports = [./process-compose-options.nix]; }];
-      };
-      default = {
-        config.processes = {
-          "${name}" = {
-            package = config.runWithEnv;
-            availability.restart = "always";
-            depends_on = lib.genAttrs config.depsToStart (depName: {
-              condition = config.dependsOn.${depName}.condition;
-            });
-          };
-        };
-      };
     };
   };
 }

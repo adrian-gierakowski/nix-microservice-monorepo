@@ -1,10 +1,10 @@
 { config, pkgs, lib, ... }:
 let
   name = import ./name.nix;
-  cfg = config.services.${name};
+  cfg = config.processes.${name};
 in
 {
-  services."${name}" = {
+  processes."${name}" = {
     package = pkgs.writers-extra.writeBashBinStrict name ''
       write_to_path="$DATA_DIR/$WRITE_TO_FIILE_NAME"
 
@@ -26,9 +26,9 @@ in
     runtimeConfig = {
       INTERVAL_MS = 500;
       WRITE_TO_FIILE_NAME = "A";
-      RANDOMNESS_SERVICE_HOST = config.services.randomness-service.runtimeConfig.HOST;
-      RANDOMNESS_SERVICE_PORT = config.services.randomness-service.runtimeConfig.PORT;
-      DATA_DIR = config.services.frontend.runtimeConfig.DATA_DIR;
+      RANDOMNESS_SERVICE_HOST = config.processes.randomness-service.runtimeConfig.HOST;
+      RANDOMNESS_SERVICE_PORT = config.processes.randomness-service.runtimeConfig.PORT;
+      DATA_DIR = config.processes.frontend.runtimeConfig.DATA_DIR;
     };
   };
 }

@@ -52,7 +52,7 @@ let
             pkgs = self;
             inputs = { inherit sources; nix = self.nix;};
             platformModules = {
-              service = import ./modules/service.nix;
+              process = import ./modules/process.nix;
             };
           };
           modules = [
@@ -66,8 +66,7 @@ let
             {
               imports = [
                 ./../services
-                ./modules/services.nix
-                ./modules/process-compose.nix
+                ./modules/processes-with-process-compose.nix
               ];
             }
           ];

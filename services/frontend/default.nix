@@ -1,10 +1,10 @@
 { config, pkgs, lib, ... }:
 let
   name = import ./name.nix;
-  cfg = config.services.${name};
+  cfg = config.processes.${name};
 in
 {
-  services."${name}" = {
+  processes."${name}" = {
     package = pkgs.writers-extra.writeBashBinStrict name ''
       ${lib.getExe pkgs.fileshare} -p "$PORT" "$DATA_DIR"
     '';
