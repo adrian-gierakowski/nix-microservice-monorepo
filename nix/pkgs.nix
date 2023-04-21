@@ -51,41 +51,25 @@ let
           specialArgs = {
             pkgs = self;
             inputs = { inherit sources; nix = self.nix;};
+            platformModules = {
+              service = import ./modules/service.nix;
+            };
           };
           modules = [
             {
               config = {
                 # _module.args.baseModules = modules;
                 # _module.args.pkgsPath = self.lib.mkDefault self.path;
-                # _module.args.pkgs = self.lib.mkDefault self;
+                _module.args.pkgs = self.lib.mkDefault self;
               };
             }
-            ({ kubenix, ... }: {
-              imports = with kubenix.modules; [k8s];
-              kubernetes.resources.deployments.my-deployment = {
-                spec = {
-                  selector.matchLabels.app = "my-deployment";
-                  # template.metadata.labels.app = "my-deployment";
-                  template.spec = {
-                    containers.my-deployment = {
-                      # image = "my-deployment";
-                    };
-                  };
-                };
-              };
-            })
             {
-              kubernetes.api.resources.apps.v1.Deployment.my-deployment.metadata.annotations = {
-                my-annotation = "some-annotation";
-              };
+              imports = [
+                ./../services
+                ./modules/services.nix
+                ./modules/process-compose.nix
+              ];
             }
-            # {
-            #   imports = [
-            #     ./../services
-            #     ./modules/services.nix
-            #     ./modules/process-compose.nix
-            #   ];
-            # }
           ];
         };
       })
