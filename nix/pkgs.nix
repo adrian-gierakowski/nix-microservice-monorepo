@@ -29,7 +29,7 @@ let
           self.platform.config
           [
             (lib.extra.filterValue
-              (name: value: !(
+              (name: value: (lib.isDerivation value) || !(
                 # lib.extra.isIn name []
                 # ||
                 builtins.isFunction value
@@ -63,12 +63,24 @@ let
                 _module.args.pkgs = self.lib.mkDefault self;
               };
             }
-            {
-              imports = [
-                ./../services
-                ./modules/processes-with-process-compose.nix
-              ];
-            }
+            ({ kubenix, ... }: {
+              imports = with kubenix.modules; [k8s];
+              kubernetes.resources.deployments.my-deploy = self.kubelib.resources.deployment {
+                name = "my-deploy";
+                image = "image";
+              };
+            })
+            ({ kubenix, ... }: {
+              kubernetes.resources = self.kubelib.patches.exposeDeployment {
+                name = "my-deploy";
+              };
+            })
+            # {
+            #   imports = [
+            #     ./../services
+            #     ./modules/processes-with-process-compose.nix
+            #   ];
+            # }
           ];
         };
       })

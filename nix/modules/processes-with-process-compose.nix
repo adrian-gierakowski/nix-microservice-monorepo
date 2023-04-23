@@ -4,6 +4,8 @@
   ...
 }:
 let
+  inherit (config) processes;
+  # TODO: move to lib
   processComposeProcessConfig = processConfig: {
     package = processConfig.runWithEnv;
     availability.restart =
@@ -17,6 +19,11 @@ let
       condition = processConfig.dependsOn.${depName}.condition;
     });
   };
+  serviceNames = builtins.attrNames processes;
+  allProcessComposeProcesses = builtins.mapAttrs
+    (name: value: processComposeProcessConfig value)
+    processes
+  ;
   processComposeCofigsForProcesses = processConfigs:
     let
       collectProcessConfigs = name:
@@ -36,12 +43,16 @@ let
       (name:
         let processes = builtins.listToAttrs (collectProcessConfigs name);
         in { config.processes = processes; })
-;
+  ;
+  configsPerProcess = processComposeCofigsForProcesses processes;
 in
 {
   imports = [
     ./process-compose.nix
     ./processes.nix
   ];
-  config.process-compose = processComposeCofigsForProcesses config.processes;
+  config = lib.mkMerge [
+    # { process-compose = configsPerProcess; }
+    { process-compose.all.config.processes = allProcessComposeProcesses; }
+  ];
 }
