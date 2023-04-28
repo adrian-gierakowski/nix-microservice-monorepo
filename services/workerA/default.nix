@@ -31,4 +31,5 @@ in
       DATA_DIR = config.processes.frontend.runtimeConfig.DATA_DIR;
     };
   };
+  processes.bash = { package = pkgs.bash; };
 }

@@ -62,19 +62,51 @@ let
                 # _module.args.pkgsPath = self.lib.mkDefault self.path;
                 _module.args.pkgs = self.lib.mkDefault self;
               };
+              options = {
+                testOpt = self.lib.mkOption {
+                  type = self.lib.types.str;
+                  default = "1";
+                };
+              };
+              # options = {
+              #   kubernetes = self.lib.mkOption {
+              #     type = self.lib.types.attrs;
+              #     default = {};
+              #   };
+              # };
             }
             ({ kubenix, ... }: {
-              imports = with kubenix.modules; [k8s];
-              kubernetes.resources.deployments.my-deploy = self.kubelib.resources.deployment {
-                name = "my-deploy";
-                image = "image";
+              imports = with kubenix.modules; [submodules k8s];
+              # # Import submodule.
+              submodules.imports = [
+                ./modules/simple-sub.nix
+                ./modules/deployment.nix
+                # /home/adrian/code/rhinofi/kubenix-hall/docs/content/examples/namespaces/namespaced.nix
+              ];
+
+              submodules.propagate.enable = false;
+
+              # # kubernetes.resources.deployments.my-deploy = self.kubelib.resources.deployment {
+              # #   name = "my-deploy";
+              # #   image = "image";
+              # # };
+              submodules.instances.my-deploy = {
+                submodule = "deployment";
               };
-            })
-            ({ kubenix, ... }: {
-              kubernetes.resources = self.kubelib.patches.exposeDeployment {
-                name = "my-deploy";
+              submodules.instances.my-deploy-2 = {
+                submodule = "deployment";
               };
+              # submodules.instances.namespace-https = {
+              #   submodule = "namespaced";
+              #   args = {};
+              # };
             })
+            # (import /home/adrian/code/rhinofi/kubenix-hall/docs/content/examples/namespaces/module.nix)
+            # ({ kubenix, config, ... }: {
+            #   kubernetes.resources = self.kubelib.patches.exposeDeployment {
+            #     name = "my-deploy";
+            #   };
+            # })
             # {
             #   imports = [
             #     ./../services

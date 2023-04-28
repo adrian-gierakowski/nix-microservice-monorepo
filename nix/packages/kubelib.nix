@@ -86,4 +86,5 @@ lib.makeExtensible (self: {
         }
     ;
   };
+  # submodules.deployment = ./../modules/deployment.nix;
 })
