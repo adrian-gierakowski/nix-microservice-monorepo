@@ -18,6 +18,19 @@ let
       # Load all packages from ./packages, using filename as the name of the
       # pkgs attribute.
       (self: super: super.lib.extra.importPackagesFromDir self ./packages)
+      (self: super: {
+        helloImage = self.dockerTools.buildImage {
+          name = "hello";
+          created = "now";
+          copyToRoot = self.buildEnv {
+            name = "image-root";
+            paths = [ self.hello ];
+            pathsToLink = [ "/bin" ];
+          };
+
+          config.Cmd = [ "/bin/hello" ];
+        };
+      })
       # (self: super: { kubenix = (import /home/adrian/code/kubenix-hall-adrian).kubenix.${self.system}; })
       (import /home/adrian/code/kubenix-hall-adrian/default.nix).overlays.default
       # (import sources.kubenix).overlays.default
@@ -76,7 +89,11 @@ let
               # };
             }
             ({ kubenix, ... }: {
-              imports = with kubenix.modules; [submodules k8s];
+              imports = with kubenix.modules; [
+                submodules
+                k8s
+                docker
+              ];
               # # Import submodule.
               submodules.imports = [
                 ./modules/simple-sub.nix
@@ -84,18 +101,27 @@ let
                 # /home/adrian/code/rhinofi/kubenix-hall/docs/content/examples/namespaces/namespaced.nix
               ];
 
-              submodules.propagate.enable = false;
+              submodules.specialArgs = { pkgs = self; };
+
+              # submodules.propagate.enable = false;
 
               # # kubernetes.resources.deployments.my-deploy = self.kubelib.resources.deployment {
               # #   name = "my-deploy";
               # #   image = "image";
               # # };
+              docker.images.hello.image = self.helloImage;
               submodules.instances.my-deploy = {
                 submodule = "deployment";
+                args.image = self.helloImage;
+                config.docker.registry.url = "eu.gcr.io/my-gcp-project";
               };
-              submodules.instances.my-deploy-2 = {
-                submodule = "deployment";
-              };
+              # submodules.instances.my-deploy-2 = {
+              #   submodule = "deployment";
+              # };
+              # submodules.instances.simple = {
+              #   submodule = "simple-sub";
+              #   args.str = "1214";
+              # };
               # submodules.instances.namespace-https = {
               #   submodule = "namespaced";
               #   args = {};

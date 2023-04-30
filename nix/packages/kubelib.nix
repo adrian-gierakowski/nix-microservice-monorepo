@@ -10,6 +10,7 @@ lib.makeExtensible (self: {
       spec.selector.matchLabels = labels;
     };
   };
+  pathFromImage = image: "${image.imageName}:${image.imageTag}";
   resources = {
     deployment = {
       name,
