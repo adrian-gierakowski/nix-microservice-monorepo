@@ -7,7 +7,6 @@
     ])
     ++
     [
-
       ./frontend
       ./randomness-service
       ./workerA

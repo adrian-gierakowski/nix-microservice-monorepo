@@ -6,8 +6,6 @@
 }:
 let
   allOverlays =
-    # These overlays augment centrally defined packages with things specific
-    # to this service.
     [
       (self: super: { lib = super.lib.extend (lib: _: { extra = import ./lib-extra { inherit lib; }; }); })
       (self: super: { nix-filter = import sources.nix-filter; })
