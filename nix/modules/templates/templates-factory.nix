@@ -3,6 +3,7 @@
   template,
   optsToOmitExtra ? [],
   optsToSetExtra ? [],
+  passthruWhitelist ? [],
 }:
 {
   config,
@@ -16,7 +17,12 @@ in
 {
   imports = [
     # ./templates-options.nix
-    (import ./templates-base-factory.nix { inherit name optsToOmitExtra optsToSetExtra; })
+    (import ./templates-base-factory.nix { inherit
+      name
+      optsToOmitExtra
+      passthruWhitelist
+      optsToSetExtra;
+    })
   ];
   options.templates."${name}" = mkOption { type = lib.types.str; default = name; };
 

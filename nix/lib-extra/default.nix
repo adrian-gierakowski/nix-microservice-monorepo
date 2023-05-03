@@ -153,4 +153,6 @@ rec {
         assocPath path newValue attrs
     else attrs
   ;
+  allDefault = builtins.mapAttrs (name: value: lib.mkDefault value);
+  allForce = builtins.mapAttrs (name: value: lib.mkForce value);
 }

@@ -12,12 +12,11 @@ in
       PORT = lib.types.port;
       DATA_DIR = lib.types.str;
     });
-    runtimeConfig = { PORT = lib.mkDefault 8888; DATA_DIR = "./.data"; };
+    runtimeConfig = lib.extra.allDefault {
+      PORT = 8888;
+      DATA_DIR = "./.data";
+    };
     dependsOn.randomness-service = {};
-    # dependsOn.db.startOverride = true;
-    # dependsOn.worker.startOverride = false;
-    startDeps = true;
-
-    # deploymentForProcess = ;
   };
+  deploymentsForProcesses.${name} = {};
 }

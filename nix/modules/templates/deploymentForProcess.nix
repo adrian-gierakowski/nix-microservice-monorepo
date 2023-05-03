@@ -10,9 +10,9 @@ let
   process = parentConfig.processes.${name};
 in {
   options = {
-    isWorker = lib.mkOption {
+    enableService = lib.mkOption {
       type = lib.types.bool;
-      default = false;
+      default = process.type == "server";
     };
     runtimeConfigPortVarName = lib.mkOption {
       type = lib.types.str;
@@ -41,19 +41,21 @@ in {
       };
       env = process.runtimeEnv;
     };
-    services = if config.isWorker
-      then {}
-      else {
+    services =
+      if config.enableService
+      then
+      {
         "${name}" =
-          let
+          (let
             portVarName = config.runtimeConfigPortVarName;
             ifPortInConfig = lib.mkIf (process.runtimeConfig ? "${portVarName}");
           in {
             containerPort = ifPortInConfig process.runtimeConfig.${portVarName};
             containerPortEnvName = ifPortInConfig null;
-          }
+          })
         ;
       }
+      else {}
     ;
   };
 }

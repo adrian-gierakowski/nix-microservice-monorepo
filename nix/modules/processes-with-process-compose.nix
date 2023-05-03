@@ -52,7 +52,7 @@ in
     ./processes.nix
   ];
   config = lib.mkMerge [
-    # { process-compose = configsPerProcess; }
+    { process-compose = configsPerProcess; }
     { process-compose.all.config.processes = allProcessComposeProcesses; }
   ];
 }

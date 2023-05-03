@@ -1,7 +1,6 @@
 { config, pkgs, lib, ... }:
 let
   name = import ./name.nix;
-  cfg = config.processes.${name};
   package = import ./package.nix;
 in
 {
@@ -17,4 +16,5 @@ in
     };
     dependsOn.workerA = {};
   };
+  deploymentsForProcesses.${name} = {};
 }

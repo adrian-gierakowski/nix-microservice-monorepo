@@ -2,7 +2,7 @@
   sources ? import ./sources.nix,
   config ? {},
   system ? builtins.currentSystem,
-  overlays ? []
+  overlays ? [],
 }:
 let
   allOverlays =
@@ -31,15 +31,13 @@ let
           config.Cmd = [ "/bin/hello" ];
         };
       })
-      # (self: super: { kubenix = (import /home/adrian/code/kubenix-hall-adrian).kubenix.${self.system}; })
       (import /home/adrian/code/kubenix-hall-adrian/default.nix).overlays.default
       # (import sources.kubenix).overlays.default
       (self: super: let
         inherit (super) lib;
         removeEmptyAttrs = lib.converge (lib.filterAttrsRecursive (name: value: !(value == {})));
-      in {
-        platformConfig = lib.pipe
-          self.platform.config
+        sanitizeConfig = config: lib.pipe
+          config
           [
             (lib.extra.filterValue
               (name: value: (lib.isDerivation value) || !(
@@ -50,25 +48,13 @@ let
                 lib.types.isOptionType value
             )))
             (lib.extra.headOr {})
-            (lib.extra.overPathIfExists ["kubernetes" "api"] (a: builtins.removeAttrs a ["definitions" "types"]))
+            (lib.extra.overPathIfExists ["kubernetes" "api"] (a: builtins.removeAttrs a ["definitions" "types" "_m" "_module"]))
             (lib.extra.overPathIfExists ["kubernetes" "api" "resources"] removeEmptyAttrs)
           ]
         ;
-        platformConfigJSON = self.writers-extra.writeJSON
-          { name = "platform-config-json"; }
-          self.platformConfig
-        ;
-        # test = self.lib.evalModules { modules = []; };
-        platform = self.kubenix.evalModules {
-        # platform = self.lib.evalModules {
-          specialArgs = {
-            pkgs = self;
-            inputs = { inherit sources; nix = self.nix;};
-            platformModules = {
-              process = import ./modules/process.nix;
-            };
-          };
-          modules = [
+      in {
+        platformTemplate = self.lib.makeExtensible (final: {
+          baseModules = [
             {
               config = {
                 # _module.args.baseModules = modules;
@@ -81,19 +67,9 @@ let
                   default = "1";
                 };
               };
-              # options = {
-              #   kubernetes = self.lib.mkOption {
-              #     type = self.lib.types.attrs;
-              #     default = {};
-              #   };
-              # };
             }
-            ({ kubenix, config, ... }: {
+            ({ kubenix, ... }: {
               imports =
-                [
-                  ./modules/templates/templates-options.nix
-                ]
-                ++
                 (with kubenix.modules; [
                   # submodules
                   k8s
@@ -102,73 +78,11 @@ let
                 ++
                 (with self.kubelib.templates; [
                   deployments
-                  # services
-                  ./modules/templates/deployments2.nix
-                  # deploymentsForProcesses
+                  services
+                  deploymentsForProcesses
                 ])
-                # ++
-                # [{
-                #   options.templates.names = self.lib.mkOption {
-                #     type = self.lib.types.listOf self.lib.types.str;
-                #     default = [];
-                #   };
-                # }]
               ;
-
-              # # Import submodule.
-              # submodules.imports = [
-              #   ./modules/simple-sub.nix
-              #   ./modules/deployment.nix
-              #   ./modules/serviceForDeployment.nix
-              #   # /home/adrian/code/rhinofi/kubenix-hall/docs/content/examples/namespaces/namespaced.nix
-              # ];
-
-              # submodules.specialArgs = {
-              #   pkgs = self;
-              #   parentConfig = config;
-              # };
-
-              # submodules.propagate.enable = false;
-
-              # # kubernetes.resources.deployments.my-deploy = self.kubelib.resources.deployment {
-              # #   name = "my-deploy";
-              # #   image = "image";
-              # # };
-              # docker.images.hello.image = self.helloImage;
-              # submodules.instances.my-deploy = {
-              #   submodule = "deployment";
-              #   args.image = self.helloImage;
-              #   config.docker.registry.url = "eu.gcr.io/my-gcp-project";
-              # };
-
-              # submodules.instances.my-service = {
-              #   submodule = "serviceForDeployment";
-              #   args.port = 80;
-              #   config._module.args.name = self.lib.mkForce "my-deploy";
-              # };
-
-              deployments.example.image = self.helloImage;
-              # services.example = {};
-              # deploymentsForProcesses.frontend = {};
-
-              # submodules.instances.my-deploy-2 = {
-              #   submodule = "deployment";
-              # };
-              # submodules.instances.simple = {
-              #   submodule = "simple-sub";
-              #   args.str = "1214";
-              # };
-              # submodules.instances.namespace-https = {
-              #   submodule = "namespaced";
-              #   args = {};
-              # };
             })
-            # (import /home/adrian/code/rhinofi/kubenix-hall/docs/content/examples/namespaces/module.nix)
-            # ({ kubenix, config, ... }: {
-            #   kubernetes.resources = self.kubelib.patches.exposeDeployment {
-            #     name = "my-deploy";
-            #   };
-            # })
             {
               imports = [
                 ./../services
@@ -176,7 +90,27 @@ let
               ];
             }
           ];
-        };
+          specialArgs = {
+            pkgs = self;
+            inputs = { inherit sources; nix = self.nix;};
+          };
+          extraModules = [];
+          modules = final.baseModules ++ final.extraModules;
+          evaled = self.kubenix.evalModules {
+            inherit (final) specialArgs modules;
+          };
+          config = sanitizeConfig final.evaled.config;
+          configJSON = self.writers-extra.writeJSON
+            { name = "platform-config-json"; }
+            self.platformConfig
+          ;
+        });
+        platform.prd = self.platformTemplate;
+        platform.dev = self.platformTemplate.extend (_:_:{
+          extraModules = [
+            { imports = [./../services/dev.nix]; }
+          ];
+        });
       })
     ]
     ++

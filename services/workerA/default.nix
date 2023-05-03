@@ -1,16 +1,15 @@
 { config, pkgs, lib, ... }:
 let
   name = import ./name.nix;
-  cfg = config.processes.${name};
 in
 {
   processes."${name}" = {
+    type = "worker";
     package = pkgs.writers-extra.writeBashBinStrict name ''
       write_to_path="$DATA_DIR/$WRITE_TO_FIILE_NAME"
 
       response=$(${lib.getExe pkgs.curl} -s http://$RANDOMNESS_SERVICE_HOST:$RANDOMNESS_SERVICE_PORT)
       >&2 echo "got response: $response"
-
 
       >&2 echo "writing to: $write_to_path"
 
@@ -31,5 +30,5 @@ in
       DATA_DIR = config.processes.frontend.runtimeConfig.DATA_DIR;
     };
   };
-  processes.bash = { package = pkgs.bash; };
+  deploymentsForProcesses.${name} = {};
 }

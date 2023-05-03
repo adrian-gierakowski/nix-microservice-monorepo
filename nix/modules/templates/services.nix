@@ -4,6 +4,7 @@
     (import ./templates-factory.nix {
       name = "services";
       template = ./service.nix;
+      passthruWhitelist = ["kubernetes"];
     })
   ];
 }

@@ -3,6 +3,7 @@
   optsToOmit ? ["_module" "_m" "submodules" "templates" name],
   optsToOmitExtra ? [],
   optsToSetExtra ? [],
+  passthruWhitelist ? [],
 }:
 {
   config,
@@ -13,9 +14,11 @@
 let
   allTemplateNames = builtins.attrNames options.templates;
   optionsToOmit = optsToOmit ++ optsToOmitExtra ++ allTemplateNames;
-  optionNames =
-    (builtins.attrNames (removeAttrs options optionsToOmit))
-    ++ optsToSetExtra
+  optionNames = if passthruWhitelist != []
+    then passthruWhitelist
+    else
+      (builtins.attrNames (removeAttrs options optionsToOmit))
+      ++ optsToSetExtra
   ;
   templateInstances = builtins.attrValues config.${name};
   getPassthruDefsForOptName = name: map
