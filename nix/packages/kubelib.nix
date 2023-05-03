@@ -96,9 +96,4 @@ lib.makeExtensible (self: {
         }
     ;
   };
-  templates =  {
-    deployments = ./../modules/templates/deployments.nix;
-    services = ./../modules/templates/services.nix;
-    deploymentsForProcesses = ./../modules/templates/deploymentsForProcesses.nix;
-  };
 })

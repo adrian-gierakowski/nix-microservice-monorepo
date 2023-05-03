@@ -24,7 +24,7 @@
 
   config = {
     submodule = {
-      name = "simple-sub";
+      name = "simple-kubenix-submodule";
       passthru = {
         testOpt = args.str;
       };

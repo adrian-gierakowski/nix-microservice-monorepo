@@ -7,7 +7,7 @@
   ...
 }@args:
 {
-  options = builtins.trace (builtins.attrNames args.specialArgs) {
+  options = {
     image = lib.mkOption {
       type = lib.types.package;
     };

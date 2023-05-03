@@ -18,6 +18,7 @@ let
       # Load all packages from ./packages, using filename as the name of the
       # pkgs attribute.
       (self: super: super.lib.extra.importPackagesFromDir self ./packages)
+      (self: super: { modules = import ./modules; })
       (self: super: {
         helloImage = self.dockerTools.buildImage {
           name = "hello";
@@ -54,7 +55,7 @@ let
         ;
       in {
         testConfig = self.lib.evalModules { modules = [({ ... }@args: {
-          options = builtins.trace (builtins.attrNames args.specialArgs) {
+          options = {
             testOpt = self.lib.mkOption {
               type = self.lib.types.str;
               default = "1";
@@ -79,7 +80,6 @@ let
             {
               imports = [
                 ./../services
-                ./modules/processes-with-process-compose.nix
               ];
             }
           ];
