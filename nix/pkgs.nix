@@ -32,8 +32,8 @@ let
           config.Cmd = [ "/bin/hello" ];
         };
       })
-      (import /home/adrian/code/kubenix-hall-adrian/default.nix).overlays.default
-      # (import sources.kubenix).overlays.default
+      # (import /home/adrian/code/kubenix-hall-adrian/default.nix).overlays.default
+      (import sources.kubenix).overlays.default
       (self: super: let
         inherit (super) lib;
         removeEmptyAttrs = lib.converge (lib.filterAttrsRecursive (name: value: !(value == {})));

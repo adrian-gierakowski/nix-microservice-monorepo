@@ -1,26 +1,14 @@
 {
     "kubenix": {
-        "branch": "main",
+        "branch": "ag/various-improvements",
         "description": "Kubernetes management with Nix",
         "homepage": "https://kubenix.org",
-        "owner": "hall",
+        "owner": "adrian-gierakowski",
         "repo": "kubenix",
-        "rev": "20907f568e1beba86ecbf2383b0158867a2040c7",
-        "sha256": "1mksr706zjixjbvmxi5bfglx77facrbgcrzkafcnrd3r874dayy0",
+        "rev": "b42f9118aebcc816706053a0bfedc5cbd27d74bd",
+        "sha256": "19ss45v6rl0h5zw30jy768apn8wlw1lxdz8vbhab0sh8an6hxzc1",
         "type": "tarball",
-        "url": "https://github.com/hall/kubenix/archive/20907f568e1beba86ecbf2383b0158867a2040c7.tar.gz",
-        "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
-    },
-    "kubenix-dvf": {
-        "branch": "deversifi-support-k8s-1.18-1.23",
-        "description": "Kubernetes resource builder using nix",
-        "homepage": null,
-        "owner": "deversifi",
-        "repo": "kubenix",
-        "rev": "af9e221c24db806d4160b8f99ef228c54772852b",
-        "sha256": "1dd30sj0xsw6glkdwawpr8iacqikxa2skijffma0s41giaqncc6z",
-        "type": "tarball",
-        "url": "https://github.com/deversifi/kubenix/archive/af9e221c24db806d4160b8f99ef228c54772852b.tar.gz",
+        "url": "https://github.com/adrian-gierakowski/kubenix/archive/b42f9118aebcc816706053a0bfedc5cbd27d74bd.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
     "nix-filter": {
