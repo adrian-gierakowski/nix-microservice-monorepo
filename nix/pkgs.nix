@@ -53,6 +53,14 @@ let
           ]
         ;
       in {
+        testConfig = self.lib.evalModules { modules = [({ ... }@args: {
+          options = builtins.trace (builtins.attrNames args.specialArgs) {
+            testOpt = self.lib.mkOption {
+              type = self.lib.types.str;
+              default = "1";
+            };
+          };
+        })]; };
         platformTemplate = self.lib.makeExtensible (final: {
           baseModules = [
             {
@@ -68,21 +76,6 @@ let
                 };
               };
             }
-            ({ kubenix, ... }: {
-              imports =
-                (with kubenix.modules; [
-                  # submodules
-                  k8s
-                  docker
-                ])
-                ++
-                (with self.kubelib.templates; [
-                  deployments
-                  services
-                  deploymentsForProcesses
-                ])
-              ;
-            })
             {
               imports = [
                 ./../services

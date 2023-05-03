@@ -5,9 +5,9 @@
   pkgs,
   parentConfig,
   ...
-}:
+}@args:
 {
-  options = {
+  options = builtins.trace (builtins.attrNames args.specialArgs) {
     image = lib.mkOption {
       type = lib.types.package;
     };

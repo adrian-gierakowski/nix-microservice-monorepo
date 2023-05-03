@@ -1,9 +1,6 @@
 {
   name,
-  optsToOmit ? ["_module" "_m" "submodules" "templates" name],
-  optsToOmitExtra ? [],
-  optsToSetExtra ? [],
-  passthruWhitelist ? [],
+  producesProps,
 }:
 {
   config,
@@ -12,14 +9,6 @@
   ...
 }:
 let
-  allTemplateNames = builtins.attrNames options.templates;
-  optionsToOmit = optsToOmit ++ optsToOmitExtra ++ allTemplateNames;
-  optionNames = if passthruWhitelist != []
-    then passthruWhitelist
-    else
-      (builtins.attrNames (removeAttrs options optionsToOmit))
-      ++ optsToSetExtra
-  ;
   templateInstances = builtins.attrValues config.${name};
   getPassthruDefsForOptName = name: map
     (x: x._internal.passthru.config.${name})
@@ -30,7 +19,7 @@ let
   ;
   passthruConfigs = map
     (name: { "${name}" = lib.mkMerge (getPassthruDefsForOptName name); })
-    optionNames
+    producesProps
   ;
 in {
   config = lib.mkMerge passthruConfigs;
