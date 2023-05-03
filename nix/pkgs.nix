@@ -88,20 +88,45 @@ let
               #   };
               # };
             }
-            ({ kubenix, ... }: {
-              imports = with kubenix.modules; [
-                submodules
-                k8s
-                docker
-              ];
-              # # Import submodule.
-              submodules.imports = [
-                ./modules/simple-sub.nix
-                ./modules/deployment.nix
-                # /home/adrian/code/rhinofi/kubenix-hall/docs/content/examples/namespaces/namespaced.nix
-              ];
+            ({ kubenix, config, ... }: {
+              imports =
+                [
+                  ./modules/templates/templates-options.nix
+                ]
+                ++
+                (with kubenix.modules; [
+                  # submodules
+                  k8s
+                  docker
+                ])
+                ++
+                (with self.kubelib.templates; [
+                  deployments
+                  # services
+                  ./modules/templates/deployments2.nix
+                  # deploymentsForProcesses
+                ])
+                # ++
+                # [{
+                #   options.templates.names = self.lib.mkOption {
+                #     type = self.lib.types.listOf self.lib.types.str;
+                #     default = [];
+                #   };
+                # }]
+              ;
 
-              submodules.specialArgs = { pkgs = self; };
+              # # Import submodule.
+              # submodules.imports = [
+              #   ./modules/simple-sub.nix
+              #   ./modules/deployment.nix
+              #   ./modules/serviceForDeployment.nix
+              #   # /home/adrian/code/rhinofi/kubenix-hall/docs/content/examples/namespaces/namespaced.nix
+              # ];
+
+              # submodules.specialArgs = {
+              #   pkgs = self;
+              #   parentConfig = config;
+              # };
 
               # submodules.propagate.enable = false;
 
@@ -109,12 +134,23 @@ let
               # #   name = "my-deploy";
               # #   image = "image";
               # # };
-              docker.images.hello.image = self.helloImage;
-              submodules.instances.my-deploy = {
-                submodule = "deployment";
-                args.image = self.helloImage;
-                config.docker.registry.url = "eu.gcr.io/my-gcp-project";
-              };
+              # docker.images.hello.image = self.helloImage;
+              # submodules.instances.my-deploy = {
+              #   submodule = "deployment";
+              #   args.image = self.helloImage;
+              #   config.docker.registry.url = "eu.gcr.io/my-gcp-project";
+              # };
+
+              # submodules.instances.my-service = {
+              #   submodule = "serviceForDeployment";
+              #   args.port = 80;
+              #   config._module.args.name = self.lib.mkForce "my-deploy";
+              # };
+
+              deployments.example.image = self.helloImage;
+              # services.example = {};
+              # deploymentsForProcesses.frontend = {};
+
               # submodules.instances.my-deploy-2 = {
               #   submodule = "deployment";
               # };
@@ -133,12 +169,12 @@ let
             #     name = "my-deploy";
             #   };
             # })
-            # {
-            #   imports = [
-            #     ./../services
-            #     ./modules/processes-with-process-compose.nix
-            #   ];
-            # }
+            {
+              imports = [
+                ./../services
+                ./modules/processes-with-process-compose.nix
+              ];
+            }
           ];
         };
       })

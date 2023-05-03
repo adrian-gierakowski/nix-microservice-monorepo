@@ -5,7 +5,7 @@
 }:
 lib.makeExtensible (self: {
   labels = {
-    selectorMatch = labels: {
+    deploymentLabels = labels: {
       spec.template.metadata = { inherit labels; };
       spec.selector.matchLabels = labels;
     };
@@ -21,7 +21,7 @@ lib.makeExtensible (self: {
       matchLabels ? { app = name; }
     }:
       let
-        labels = self.labels.selectorMatch matchLabels;
+        labels = self.labels.deploymentLabels matchLabels;
         deploy = {
           metadata = { inherit name; };
           spec = {
@@ -47,6 +47,7 @@ lib.makeExtensible (self: {
         protocol ? "TCP",
         targetPort ? "default",
         type ? "ClusterIP",
+        selector,
       }:
       {
         metadata = { inherit name; };
@@ -60,6 +61,7 @@ lib.makeExtensible (self: {
             name = "default";
           };
           type = lib.mkDefault type;
+          inherit selector;
         };
       }
     ;
@@ -71,21 +73,32 @@ lib.makeExtensible (self: {
         port ? 80,
         containerPort ? 8080,
         containerPortName ? "default",
+        containerPortEnvName ? "PORT",
         containerName ? "default",
-        serviceType ? "ClusterIP",
+        type ? "ClusterIP",
+        selector ? { app = name; },
       }:
         {
-          deployments.${name}.spec.template.spec.containers.${containerName}.ports.${containerPortName} = {
-            containerPort = containerPort;
-            name = containerPortName;
+          deployments.${name}.spec.template.spec.containers.${containerName} = {
+            ports.${containerPortName} = {
+              containerPort = containerPort;
+              name = containerPortName;
+            };
+            env = if containerPortEnvName == null then {} else {
+              "${containerPortEnvName}".value = toString containerPort;
+            };
           };
           services.${name} = self.resources.service {
-            inherit name;
-            type = serviceType;
+            inherit name type port;
             targetPort = containerPortName;
+            inherit selector;
           };
         }
     ;
   };
-  # submodules.deployment = ./../modules/deployment.nix;
+  templates =  {
+    deployments = ./../modules/templates/deployments.nix;
+    services = ./../modules/templates/services.nix;
+    deploymentsForProcesses = ./../modules/templates/deploymentsForProcesses.nix;
+  };
 })
