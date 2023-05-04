@@ -17,6 +17,7 @@ let
       # pkgs attribute.
       (self: super: super.lib.extra.importPackagesFromDir self ./packages)
       (self: super: { modules = import ./modules; })
+      (self: super: { devrhell-files-module-path = toString /home/adrian/code/devshell-files/modules; })
       (self: super: {
         helloImage = self.dockerTools.buildImage {
           name = "hello";
@@ -52,6 +53,10 @@ let
           ]
         ;
       in {
+        files = {
+          autoGenerateHeader = "This file has been auto-generated, do not edit by hand!";
+          autoGenerateHeaderNix = "# ${self.files.autoGenerateHeader}";
+        };
         testConfig = self.lib.evalModules { modules = [({ ... }@args: {
           options = {
             testOpt = self.lib.mkOption {
@@ -74,6 +79,25 @@ let
                   default = "1";
                 };
               };
+            }
+            {
+              imports = [
+                (self.devrhell-files-module-path + "/files.nix")
+                (self.devrhell-files-module-path + "/text.nix")
+                (self.devrhell-files-module-path + "/git.nix")
+              ];
+              config.file."/services/default.nix".text = ''
+                ${self.files.autoGenerateHeaderNix}
+                ${self.lib.extra.buildIndexForSubdirs ./../services}
+              '';
+              config.file."/services/dev.nix".text = ''
+                ${self.files.autoGenerateHeaderNix}
+                ${self.lib.extra.buildIndexForFilesWithNameInSubdirs "dev" ./../services}
+              '';
+              config.file."/services/stg.nix".text = ''
+                ${self.files.autoGenerateHeaderNix}
+                ${self.lib.extra.buildIndexForFilesWithNameInSubdirs "stg" ./../services}
+              '';
             }
             {
               imports = [
@@ -100,6 +124,11 @@ let
         platform.dev = self.platformTemplate.extend (_:_:{
           extraModules = [
             { imports = [./../services/dev.nix]; }
+          ];
+        });
+        platform.stg = self.platformTemplate.extend (_:_:{
+          extraModules = [
+            { imports = [./../services/stg.nix]; }
           ];
         });
       })

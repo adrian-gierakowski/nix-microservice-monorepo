@@ -47,6 +47,47 @@ rec {
     builtins.readDir
   ];
 
+  listSubDirs = compose [
+    (builtins.map (attrs: attrs.name))
+    (builtins.filter ({ name, type }:
+      # TODO: handle symlinks
+      (type == "directory") &&
+      # Ignore hidden
+      (builtins.substring 0 1 name) != "." )
+    )
+    (lib.mapAttrsToList (name: type: { inherit name type; }))
+    builtins.readDir
+  ];
+
+  baseNameOfDiscardingContext = x: baseNameOf (builtins.unsafeDiscardStringContext x);
+
+  listToModuleImports = compose [
+    (list: ''
+      {
+        imports =
+          [
+      ${list}
+          ]
+        ;
+      }''
+    )
+    (lib.concatMapStringsSep "\n" (x: "      ./${x}"))
+  ];
+
+  buildIndexForSubdirs = dir: compose [
+    listToModuleImports
+    # (map (dir: builtins.trace dir dir))
+    (builtins.filter (subdir: builtins.pathExists (dir + "/${subdir}/default.nix")))
+    listSubDirs
+  ] dir;
+
+  buildIndexForFilesWithNameInSubdirs = fileName: dir: compose [
+    listToModuleImports
+    (builtins.filter (relativefilePath: builtins.pathExists (dir + "/${relativefilePath}")))
+    (map (subdir: subdir + "/${fileName}.nix"))
+    listSubDirs
+  ] dir;
+
   listDirEntries = path:
     map
       (name: path + "/${name}")

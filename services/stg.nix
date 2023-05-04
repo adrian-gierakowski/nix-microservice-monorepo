@@ -2,10 +2,7 @@
 {
   imports =
     [
-      ./_imports
-      ./frontend
-      ./randomness-service
-      ./workerA
+
     ]
   ;
 }
