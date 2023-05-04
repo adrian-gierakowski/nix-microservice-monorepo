@@ -17,7 +17,7 @@ let
       # pkgs attribute.
       (self: super: super.lib.extra.importPackagesFromDir self ./packages)
       (self: super: { modules = import ./modules; })
-      (self: super: { devrhell-files-module-path = toString /home/adrian/code/devshell-files/modules; })
+      (self: super: { devshell-files-module-path = "${sources.devshell-files}/modules"; })
       (self: super: {
         helloImage = self.dockerTools.buildImage {
           name = "hello";
@@ -82,9 +82,9 @@ let
             }
             {
               imports = [
-                (self.devrhell-files-module-path + "/files.nix")
-                (self.devrhell-files-module-path + "/text.nix")
-                (self.devrhell-files-module-path + "/git.nix")
+                (self.devshell-files-module-path + "/files.nix")
+                (self.devshell-files-module-path + "/text.nix")
+                (self.devshell-files-module-path + "/git.nix")
               ];
               config.file."/services/default.nix".text = ''
                 ${self.files.autoGenerateHeaderNix}

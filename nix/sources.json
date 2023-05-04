@@ -1,4 +1,16 @@
 {
+    "devshell-files": {
+        "branch": "rhinofi/expose-single-devshell-independent-command-for-creating-all-files",
+        "description": "Using nix as JSON, TEXT, TOML and YAML generator",
+        "homepage": "https://cruel-intentions.github.io/devshell-files/",
+        "owner": "rhinofi",
+        "repo": "devshell-files",
+        "rev": "a3dcd759efccab25283bd57d91db96180502c44d",
+        "sha256": "0s7k8zxdl64byic0x1nb676mplr5d24jggz8jnah7ghrvhxw3l40",
+        "type": "tarball",
+        "url": "https://github.com/rhinofi/devshell-files/archive/a3dcd759efccab25283bd57d91db96180502c44d.tar.gz",
+        "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
+    },
     "kubenix": {
         "branch": "ag/various-improvements",
         "description": "Kubernetes management with Nix",
