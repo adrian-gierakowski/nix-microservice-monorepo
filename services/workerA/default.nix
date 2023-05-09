@@ -6,6 +6,10 @@ in
   processes."${name}" = {
     type = "worker";
     package = pkgs.writers-extra.writeBashBinStrict name ''
+      # TODO: demo how one-shot process of type job could
+      # be used to init DATA_DIR before this service start
+      mkdir -p "$DATA_DIR"
+
       write_to_path="$DATA_DIR/$WRITE_TO_FIILE_NAME"
 
       response=$(${lib.getExe pkgs.curl} -s http://$RANDOMNESS_SERVICE_HOST:$RANDOMNESS_SERVICE_PORT)

@@ -7,6 +7,8 @@ const max = Number(process.env.RANDOM_GENERATOR_MAX ?? 1000)
 
 console.log(`starting with config`, { host, port, min, max })
 
+const sockets = new Set();
+
 const requestListener = (req, res) => {
   const body = Math.floor(Math.random() * (max - min) + min).toFixed()
   console.log('sending response', body)
@@ -16,6 +18,16 @@ const requestListener = (req, res) => {
 
 const server = http.createServer(requestListener)
 
+server.on('connection', (socket) => {
+  sockets.add(socket)
+  sockets.add(socket)
+
+  socket.once('close', () => {
+    console.log('deleting socket')
+    sockets.delete(socket)
+  })
+})
+
 server.listen(port, host, () => {
   console.log(`Server is running on http://${host}:${port}`)
 })
@@ -23,7 +35,10 @@ server.listen(port, host, () => {
 const singlas = ['SIGINT', 'SIGTERM']
 
 singlas.forEach(signal => {
-  process.on(signal, () => {
+  process.once(signal, () => {
+    for (const socket of sockets) {
+      socket.destroy()
+    }
     console.log(`${signal} received, stopping...`)
     server.close()
   })
