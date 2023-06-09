@@ -21,7 +21,7 @@ nix run -f nix/pkgs.nix platform.prd.config.processes.frontend.runWithEnv
 cat $(nix-build nix/pkgs.nix -A platform.prd.config.kubernetes.resultYAML)
 ```
 
-4. create are templated files
+4. create all templated files
 
 ```sh
 nix run -f nix/pkgs.nix platform.prd.config.files.create-all
